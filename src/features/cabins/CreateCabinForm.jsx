@@ -31,7 +31,7 @@ function CreateCabinForm() {
 
   function onSubmit(data) {
     const newCabin = convertBackendFormat(data);
-    mutate(newCabin);
+    mutate({ ...newCabin, image: newCabin.image[0] });
   }
 
   function onError(error) {
@@ -88,6 +88,10 @@ function CreateCabinForm() {
           defaultValue={0}
           {...register('discount', {
             required: 'Discount is required',
+            min: {
+              value: 0,
+              message: 'Regular price must be positive number',
+            },
             validate: (value) =>
               Number(value) <= Number(getValues().regularPrice) ||
               'Discount must be less than or equal to regular price',
@@ -111,9 +115,15 @@ function CreateCabinForm() {
         />
       </FormRow>
 
-      <FormRow label='Cabin photo' error={null}>
-        <FileInput id='image' accept='image/*' />
-        disabled={isCreating}
+      <FormRow label='Cabin photo' error={errors?.image?.message}>
+        <FileInput
+          id='image'
+          accept='image/*'
+          {...register('image', {
+            required: 'Image is required',
+          })}
+          disabled={isCreating}
+        />
       </FormRow>
 
       <FormRow>
