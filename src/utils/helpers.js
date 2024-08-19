@@ -36,3 +36,14 @@ export const convertBackendFormat = (obj) => {
   }
   return converted;
 };
+
+export const convertFrontendFormat = (obj) => {
+  const converted = {};
+  for (const [key, value] of Object.entries(obj)) {
+    const newKey = key.replace(/_([a-z])/g, (_, letter) =>
+      letter.toUpperCase()
+    );
+    converted[newKey] = value;
+  }
+  return converted;
+};

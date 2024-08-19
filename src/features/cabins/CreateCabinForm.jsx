@@ -1,24 +1,28 @@
+import { useForm } from 'react-hook-form';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import toast from 'react-hot-toast';
 import Input from '../../ui/Input';
 import Form from '../../ui/Form';
 import Button from '../../ui/Button';
 import FileInput from '../../ui/FileInput';
 import Textarea from '../../ui/Textarea';
-import { useForm } from 'react-hook-form';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createCabin } from '../../services/apiCabins';
-import toast from 'react-hot-toast';
-import { convertBackendFormat } from '../../utils/helpers';
 import FormRow from '../../ui/FormRow';
+import { createEditCabin } from '../../services/apiCabins';
+import { convertBackendFormat } from '../../utils/helpers';
 
-function CreateCabinForm() {
+function CreateCabinForm({ cabinToEdit = {} }) {
+  const { id: editId, ...editValues } = cabinToEdit;
+  const isEditSession = Boolean(editId);
+
   const queryClient = useQueryClient();
-
-  const { register, handleSubmit, reset, getValues, formState } = useForm();
+  const { register, handleSubmit, reset, getValues, formState } = useForm({
+    defaultValues: isEditSession ? editValues : {},
+  });
 
   const { errors } = formState;
 
-  const { mutate, isPending: isCreating } = useMutation({
-    mutationFn: createCabin,
+  const { mutate: createCabin, isPending: isCreating } = useMutation({
+    mutationFn: createEditCabin,
     onSuccess: () => {
       toast.success('Cabin created successfully');
       queryClient.invalidateQueries({ queryKey: ['cabins'] });
@@ -29,9 +33,27 @@ function CreateCabinForm() {
     },
   });
 
+  const { mutate: editCabin, isPending: isEditing } = useMutation({
+    mutationFn: ({ newCabin, id }) => createEditCabin(newCabin, id),
+    onSuccess: () => {
+      toast.success('Cabin edited successfully');
+      queryClient.invalidateQueries({ queryKey: ['cabins'] });
+      reset();
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
+  const isWorking = isCreating || isEditing;
+
   function onSubmit(data) {
-    const newCabin = convertBackendFormat(data);
-    mutate({ ...newCabin, image: newCabin.image[0] });
+    const image = typeof data.image === 'string' ? data.image : data.image[0];
+
+    const convertedData = convertBackendFormat(data);
+    if (isEditSession)
+      editCabin({ newCabin: { ...convertedData, image }, id: editId });
+    else createCabin({ ...convertedData, image });
   }
 
   function onError(error) {
@@ -47,7 +69,7 @@ function CreateCabinForm() {
           {...register('name', {
             required: 'Name is required',
           })}
-          disabled={isCreating}
+          disabled={isWorking}
         />
       </FormRow>
 
@@ -62,7 +84,7 @@ function CreateCabinForm() {
               message: 'Max capacity must be at least 1',
             },
           })}
-          disabled={isCreating}
+          disabled={isWorking}
         />
       </FormRow>
 
@@ -77,7 +99,7 @@ function CreateCabinForm() {
               message: 'Regular price must be at least 1',
             },
           })}
-          disabled={isCreating}
+          disabled={isWorking}
         />
       </FormRow>
 
@@ -96,7 +118,7 @@ function CreateCabinForm() {
               Number(value) <= Number(getValues().regularPrice) ||
               'Discount must be less than or equal to regular price',
           })}
-          disabled={isCreating}
+          disabled={isWorking}
         />
       </FormRow>
 
@@ -111,7 +133,7 @@ function CreateCabinForm() {
           {...register('description', {
             required: 'Description is required',
           })}
-          disabled={isCreating}
+          disabled={isWorking}
         />
       </FormRow>
 
@@ -120,9 +142,9 @@ function CreateCabinForm() {
           id='image'
           accept='image/*'
           {...register('image', {
-            required: 'Image is required',
+            required: isEditSession ? false : 'Image is required',
           })}
-          disabled={isCreating}
+          disabled={isWorking}
         />
       </FormRow>
 
@@ -131,7 +153,9 @@ function CreateCabinForm() {
         <Button $variation='secondary' type='reset'>
           Cancel
         </Button>
-        <Button disabled={isCreating}>Add cabin</Button>
+        <Button disabled={isWorking}>
+          {isEditSession ? 'Edit cabin' : 'Add cabin'}
+        </Button>
       </FormRow>
     </Form>
   );
