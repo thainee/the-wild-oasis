@@ -7,17 +7,17 @@ import Textarea from '../../ui/Textarea';
 import FormRow from '../../ui/FormRow';
 import { convertBackendFormat } from '../../utils/helpers';
 import { useCreateCabin } from './useCreateCabin';
-import { useEditCabin } from './useEditCabin';
+import { useUpdateCabin } from './useUpdateCabin';
 
-function CreateCabinForm({ cabinToEdit = {} }) {
+function CreateCabinForm({ cabinToUpdate = {} }) {
   const { isCreating, createCabin } = useCreateCabin();
-  const { isEditing, editCabin } = useEditCabin();
-  const isWorking = isCreating || isEditing;
+  const { isUpdating, updateCabin } = useUpdateCabin();
+  const isWorking = isCreating || isUpdating;
 
-  const { id: editId, ...editValues } = cabinToEdit;
-  const isEditSession = Boolean(editId);
+  const { id: updateId, ...updateValues } = cabinToUpdate;
+  const isUpdateSession = Boolean(updateId);
   const { register, handleSubmit, reset, getValues, formState } = useForm({
-    defaultValues: isEditSession ? editValues : {},
+    defaultValues: isUpdateSession ? updateValues : {},
   });
   const { errors } = formState;
 
@@ -25,9 +25,9 @@ function CreateCabinForm({ cabinToEdit = {} }) {
     const image = typeof data.image === 'string' ? data.image : data.image[0];
 
     const convertedData = convertBackendFormat(data);
-    if (isEditSession)
-      editCabin(
-        { newCabin: { ...convertedData, image }, id: editId },
+    if (isUpdateSession)
+      updateCabin(
+        { newCabin: { ...convertedData, image }, id: updateId },
         {
           onSuccess: () => {
             reset();
@@ -131,7 +131,7 @@ function CreateCabinForm({ cabinToEdit = {} }) {
           id='image'
           accept='image/*'
           {...register('image', {
-            required: isEditSession ? false : 'Image is required',
+            required: isUpdateSession ? false : 'Image is required',
           })}
           disabled={isWorking}
         />
@@ -143,7 +143,7 @@ function CreateCabinForm({ cabinToEdit = {} }) {
           Cancel
         </Button>
         <Button disabled={isWorking}>
-          {isEditSession ? 'Edit cabin' : 'Add cabin'}
+          {isUpdateSession ? 'Update cabin' : 'Add cabin'}
         </Button>
       </FormRow>
     </Form>

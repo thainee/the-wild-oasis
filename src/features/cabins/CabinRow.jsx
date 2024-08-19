@@ -100,7 +100,7 @@ function CabinRow({ cabin }) {
         </div>
       </TableRow>
 
-      {showForm && <CreateCabinForm cabinToEdit={convertedCabin} />}
+      {showForm && <CreateCabinForm cabinToUpdate={convertedCabin} />}
     </>
   );
 }
