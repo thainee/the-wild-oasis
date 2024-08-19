@@ -28,7 +28,7 @@ export const formatCurrency = (value) =>
     value
   );
 
-export const convertBackendFormat = (obj) => {
+export const convertBackendFormat = (obj = {}) => {
   const converted = {};
   for (const [key, value] of Object.entries(obj)) {
     const newKey = key.replace(/([A-Z])/g, '_$1').toLowerCase();
@@ -37,7 +37,7 @@ export const convertBackendFormat = (obj) => {
   return converted;
 };
 
-export const convertFrontendFormat = (obj) => {
+export const convertFrontendFormat = (obj = {}) => {
   const converted = {};
   for (const [key, value] of Object.entries(obj)) {
     const newKey = key.replace(/_([a-z])/g, (_, letter) =>
