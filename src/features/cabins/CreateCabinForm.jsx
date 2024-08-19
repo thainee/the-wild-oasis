@@ -1,59 +1,48 @@
 import { useForm } from 'react-hook-form';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import toast from 'react-hot-toast';
 import Input from '../../ui/Input';
 import Form from '../../ui/Form';
 import Button from '../../ui/Button';
 import FileInput from '../../ui/FileInput';
 import Textarea from '../../ui/Textarea';
 import FormRow from '../../ui/FormRow';
-import { createEditCabin } from '../../services/apiCabins';
 import { convertBackendFormat } from '../../utils/helpers';
+import { useCreateCabin } from './useCreateCabin';
+import { useEditCabin } from './useEditCabin';
 
 function CreateCabinForm({ cabinToEdit = {} }) {
+  const { isCreating, createCabin } = useCreateCabin();
+  const { isEditing, editCabin } = useEditCabin();
+  const isWorking = isCreating || isEditing;
+
   const { id: editId, ...editValues } = cabinToEdit;
   const isEditSession = Boolean(editId);
-
-  const queryClient = useQueryClient();
   const { register, handleSubmit, reset, getValues, formState } = useForm({
     defaultValues: isEditSession ? editValues : {},
   });
-
   const { errors } = formState;
-
-  const { mutate: createCabin, isPending: isCreating } = useMutation({
-    mutationFn: createEditCabin,
-    onSuccess: () => {
-      toast.success('Cabin created successfully');
-      queryClient.invalidateQueries({ queryKey: ['cabins'] });
-      reset();
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
-
-  const { mutate: editCabin, isPending: isEditing } = useMutation({
-    mutationFn: ({ newCabin, id }) => createEditCabin(newCabin, id),
-    onSuccess: () => {
-      toast.success('Cabin edited successfully');
-      queryClient.invalidateQueries({ queryKey: ['cabins'] });
-      reset();
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
-
-  const isWorking = isCreating || isEditing;
 
   function onSubmit(data) {
     const image = typeof data.image === 'string' ? data.image : data.image[0];
 
     const convertedData = convertBackendFormat(data);
     if (isEditSession)
-      editCabin({ newCabin: { ...convertedData, image }, id: editId });
-    else createCabin({ ...convertedData, image });
+      editCabin(
+        { newCabin: { ...convertedData, image }, id: editId },
+        {
+          onSuccess: () => {
+            reset();
+          },
+        }
+      );
+    else
+      createCabin(
+        { ...convertedData, image },
+        {
+          onSuccess: () => {
+            reset();
+          },
+        }
+      );
   }
 
   function onError(error) {
