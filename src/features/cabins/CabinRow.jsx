@@ -7,18 +7,7 @@ import { useCreateCabin } from './useCreateCabin';
 import Modal from '../../ui/Modal';
 import ConfirmDelete from '../../ui/ConfirmDelete';
 import Table from '../../ui/Table';
-
-// const TableRow = styled.div`
-//   display: grid;
-//   grid-template-columns: 0.6fr 1.8fr 2.2fr 1fr 1fr 1fr;
-//   column-gap: 2.4rem;
-//   align-items: center;
-//   padding: 1.4rem 2.4rem;
-
-//   &:not(:last-child) {
-//     border-bottom: 1px solid var(--color-grey-100);
-//   }
-// `;
+import Menus from '../../ui/Menus';
 
 const Img = styled.img`
   display: block;
@@ -85,25 +74,11 @@ function CabinRow({ cabin }) {
         <span>&mdash;</span>
       )}
       <div>
-        <button onClick={handleDuplicate}>
-          <HiSquare2Stack />
-        </button>
         <Modal>
-          <Modal.Open open='edit-cabin'>
-            <button>
-              <HiPencil />
-            </button>
-          </Modal.Open>
           <Modal.Window name='edit-cabin'>
             <CreateCabinForm cabinToUpdate={convertedCabin} />
           </Modal.Window>
-        </Modal>
-        <Modal>
-          <Modal.Open open='delete-cabin'>
-            <button>
-              <HiTrash />
-            </button>
-          </Modal.Open>
+
           <Modal.Window name='delete-cabin'>
             <ConfirmDelete
               resourceName='cabin'
@@ -111,6 +86,24 @@ function CabinRow({ cabin }) {
               onConfirm={() => deleteCabin(cabinId)}
             />
           </Modal.Window>
+
+          <Menus.Menu>
+            <Menus.Toggle id={cabinId} />
+
+            <Menus.List id={cabinId}>
+              <Menus.Button icon={<HiSquare2Stack />} onClick={handleDuplicate}>
+                Duplicate
+              </Menus.Button>
+
+              <Modal.Open open='edit-cabin'>
+                <Menus.Button icon={<HiPencil />}>Edit</Menus.Button>
+              </Modal.Open>
+
+              <Modal.Open open='delete-cabin'>
+                <Menus.Button icon={<HiTrash />}>Delete</Menus.Button>
+              </Modal.Open>
+            </Menus.List>
+          </Menus.Menu>
         </Modal>
       </div>
     </Table.Row>
