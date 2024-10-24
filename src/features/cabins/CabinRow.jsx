@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { HiPencil, HiSquare2Stack, HiTrash } from 'react-icons/hi2';
 import CreateCabinForm from './CreateCabinForm';
-import { convertFrontendFormat, formatCurrency } from '../../utils/helpers';
+import { formatCurrency } from '../../utils/helpers';
 import { useDeleteCabin } from './useDeleteCabin';
 import { useCreateCabin } from './useCreateCabin';
 import Modal from '../../ui/Modal';
@@ -40,7 +40,6 @@ function CabinRow({ cabin }) {
   const { isDeleting, deleteCabin } = useDeleteCabin();
   const { createCabin } = useCreateCabin();
 
-  const convertedCabin = convertFrontendFormat(cabin);
   const {
     id: cabinId,
     name,
@@ -49,7 +48,7 @@ function CabinRow({ cabin }) {
     discount,
     description,
     image,
-  } = convertedCabin;
+  } = cabin;
 
   function handleDuplicate() {
     createCabin({
@@ -76,7 +75,7 @@ function CabinRow({ cabin }) {
       <div>
         <Modal>
           <Modal.Window name='edit-cabin'>
-            <CreateCabinForm cabinToUpdate={convertedCabin} />
+            <CreateCabinForm cabinToUpdate={cabin} />
           </Modal.Window>
 
           <Modal.Window name='delete-cabin'>

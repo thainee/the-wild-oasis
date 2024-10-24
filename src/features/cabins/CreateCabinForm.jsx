@@ -5,7 +5,6 @@ import Button from '../../ui/Button';
 import FileInput from '../../ui/FileInput';
 import Textarea from '../../ui/Textarea';
 import FormRow from '../../ui/FormRow';
-import { convertBackendFormat } from '../../utils/helpers';
 import { useCreateCabin } from './useCreateCabin';
 import { useUpdateCabin } from './useUpdateCabin';
 
@@ -24,10 +23,9 @@ function CreateCabinForm({ cabinToUpdate = {}, onCloseModal }) {
   function onSubmit(data) {
     const image = typeof data.image === 'string' ? data.image : data.image[0];
 
-    const convertedData = convertBackendFormat(data);
     if (isUpdateSession)
       updateCabin(
-        { newCabin: { ...convertedData, image }, id: updateId },
+        { newCabin: { ...data, image }, id: updateId },
         {
           onSuccess: () => {
             reset();
@@ -37,7 +35,7 @@ function CreateCabinForm({ cabinToUpdate = {}, onCloseModal }) {
       );
     else
       createCabin(
-        { ...convertedData, image },
+        { ...data, image },
         {
           onSuccess: () => {
             reset();

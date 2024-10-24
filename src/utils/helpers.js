@@ -27,23 +27,3 @@ export const formatCurrency = (value) =>
   new Intl.NumberFormat('en', { style: 'currency', currency: 'USD' }).format(
     value
   );
-
-export const convertBackendFormat = (obj = {}) => {
-  const converted = {};
-  for (const [key, value] of Object.entries(obj)) {
-    const newKey = key.replace(/([A-Z])/g, '_$1').toLowerCase();
-    converted[newKey] = value;
-  }
-  return converted;
-};
-
-export const convertFrontendFormat = (obj = {}) => {
-  const converted = {};
-  for (const [key, value] of Object.entries(obj)) {
-    const newKey = key.replace(/_([a-z])/g, (_, letter) =>
-      letter.toUpperCase()
-    );
-    converted[newKey] = value;
-  }
-  return converted;
-};

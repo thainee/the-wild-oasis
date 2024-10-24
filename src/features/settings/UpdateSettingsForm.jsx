@@ -2,7 +2,6 @@ import Form from '../../ui/Form';
 import FormRow from '../../ui/FormRow';
 import Input from '../../ui/Input';
 import Spinner from '../../ui/Spinner';
-import { convertFrontendFormat } from '../../utils/helpers';
 import { useSettings } from './useSettings';
 import { useUpdateSetting } from './useUpdateSetting';
 
@@ -15,7 +14,7 @@ function UpdateSettingsForm() {
     maxBookingLength,
     maxGuestsPerBooking,
     breakfastPrice,
-  } = convertFrontendFormat(settings);
+  } = settings;
 
   if (isPending) return <Spinner />;
 
