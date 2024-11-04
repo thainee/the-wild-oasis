@@ -42,6 +42,9 @@ function Filter({ filterField, options }) {
 
   function handleClick(value) {
     searchParams.set(filterField, value);
+
+    if (searchParams.has('page')) searchParams.delete('page');
+
     setSearchParams(searchParams);
   }
 
@@ -51,8 +54,8 @@ function Filter({ filterField, options }) {
         <FilterButton
           key={option.value}
           onClick={() => handleClick(option.value)}
-          $active={(option.value === currentFilter)}
-          disabled={(option.value === currentFilter)}
+          $active={option.value === currentFilter}
+          disabled={option.value === currentFilter}
         >
           {option.label}
         </FilterButton>
