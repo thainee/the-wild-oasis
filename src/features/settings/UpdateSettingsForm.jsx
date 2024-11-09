@@ -9,14 +9,14 @@ function UpdateSettingsForm() {
   const { isPending, settings } = useSettings();
   const { isUpdating, updateSetting } = useUpdateSetting();
 
+  if (isPending) return <Spinner />;
+  
   const {
     minBookingLength,
     maxBookingLength,
     maxGuestsPerBooking,
     breakfastPrice,
   } = settings;
-
-  if (isPending) return <Spinner />;
 
   function handleUpdate(e, field) {
     const { value } = e.target;
